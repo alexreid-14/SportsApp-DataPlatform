@@ -1,0 +1,26 @@
+# dbt
+target/
+dbt_packages/
+logs/
+profiles.yml
+/.dbt/
+
+# SQL / artifacts
+*.sql
+*.csv
+*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
