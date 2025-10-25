@@ -1,0 +1,510 @@
+version: 2
+
+sources:
+  - name: nba
+    database: nba_database
+    schema: nba_raw
+    tables:
+      - name: games_raw
+        description: Raw game data from NBA API
+        columns:
+          - name: game_id
+            description: Unique identifier for the game
+            tests:
+              - not_null
+          - name: game_date
+            description: Date when the game was played
+          - name: game_type
+            description: Type of game (regular, playoff, playin)
+          - name: season
+            description: NBA season (e.g., 2023-24)
+          - name: team_id
+            description: ID of the team
+          - name: matchup
+            description: Game matchup (e.g., "LAL vs. BOS")
+          - name: points
+            description: Points scored by the team
+          - name: is_win
+            description: Whether the team won the game
+
+      - name: teams
+        description: Team information
+        columns:
+          - name: team_id
+            description: Unique identifier for the team
+            tests:
+              - unique
+              - not_null
+          - name: full_name
+            description: Full team name
+          - name: abbreviation
+            description: Team abbreviation (e.g., LAL)
+          - name: nickname
+            description: Team nickname
+          - name: city
+            description: Team's city
+          - name: state
+            description: Team's state
+          - name: year_founded
+            description: Year the team was founded
+
+      - name: players
+        description: Player information
+        columns:
+          - name: player_id
+            description: Unique identifier for the player
+            tests:
+              - unique
+              - not_null
+          - name: full_name
+            description: Player's full name
+          - name: first_name
+            description: Player's first name
+          - name: last_name
+            description: Player's last name
+          - name: draft_year
+            description: Year player was drafted
+          - name: from_year
+            description: First year in NBA
+          - name: to_year
+            description: Last year in NBA
+          - name: position
+            description: Player's position
+          - name: height
+            description: Player's height
+          - name: weight
+            description: Player's weight
+          - name: country
+            description: Player's country of origin
+
+      - name: box_scores
+        description: Traditional box score statistics for each player in each game
+        columns:
+          - name: game_id
+            description: Unique identifier for the game
+            tests:
+              - not_null
+          - name: team_id
+            description: ID of the team
+            tests:
+              - not_null
+          - name: player_id
+            description: Unique identifier for the player
+            tests:
+              - not_null
+          - name: player_name
+            description: Player's name
+            tests:
+              - not_null
+          - name: start_position
+            description: Player's starting position
+          - name: field_goals_made
+            description: Number of field goals made
+          - name: field_goals_attempted
+            description: Number of field goals attempted
+          - name: three_pointers_made
+            description: Number of three pointers made
+          - name: three_pointers_attempted
+            description: Number of three pointers attempted
+          - name: free_throws_made
+            description: Number of free throws made
+          - name: free_throws_attempted
+            description: Number of free throws attempted
+          - name: points
+            description: Total points scored
+          - name: offensive_rebounds
+            description: Number of offensive rebounds
+          - name: defensive_rebounds
+            description: Number of defensive rebounds
+          - name: assists
+            description: Number of assists
+          - name: steals
+            description: Number of steals
+          - name: blocks
+            description: Number of blocks
+          - name: turnovers
+            description: Number of turnovers
+          - name: personal_fouls
+            description: Number of personal fouls
+          - name: minutes_played
+            description: Minutes played in the game
+          - name: plus_minus
+            description: Plus/minus rating
+          - name: comments
+            description: Additional comments about the player's performance
+
+      - name: advanced_box_scores
+        description: Advanced box score statistics for each player in each game
+        columns:
+          - name: game_id
+            description: Unique identifier for the game
+            tests:
+              - not_null
+          - name: team_id
+            description: ID of the team
+            tests:
+              - not_null
+          - name: player_id
+            description: Unique identifier for the player
+            tests:
+              - not_null
+          - name: player_name
+            description: Player's name
+            tests:
+              - not_null
+          - name: start_position
+            description: Player's starting position
+          - name: minutes_played
+            description: Minutes played in the game
+          - name: off_rating
+            description: Offensive rating
+          - name: def_rating
+            description: Defensive rating
+          - name: net_rating
+            description: Net rating
+          - name: e_off_rating
+            description: Estimated offensive rating
+          - name: e_def_rating
+            description: Estimated defensive rating
+          - name: e_net_rating
+            description: Estimated net rating
+          - name: ast_pct
+            description: Assist percentage
+          - name: ast_to
+            description: Assist to turnover ratio
+          - name: ast_ratio
+            description: Assist ratio
+          - name: oreb_pct
+            description: Offensive rebound percentage
+          - name: dreb_pct
+            description: Defensive rebound percentage
+          - name: reb_pct
+            description: Rebound percentage
+          - name: tm_tov_pct
+            description: Team turnover percentage
+          - name: efg_pct
+            description: Effective field goal percentage
+          - name: ts_pct
+            description: True shooting percentage
+          - name: usg_pct
+            description: Usage percentage
+          - name: e_usg_pct
+            description: Estimated usage percentage
+          - name: e_pace
+            description: Estimated pace
+          - name: pace
+            description: Pace
+          - name: pace_per40
+            description: Pace per 40 minutes
+          - name: poss
+            description: Possessions
+          - name: pie
+            description: Player impact estimate
+
+      - name: player_shot_locations
+        description: Detailed shot location data including coordinates, zones, action types, and game context
+        columns:
+          - name: game_id
+            description: Unique identifier for the game
+            tests:
+              - not_null
+          - name: game_event_id
+            description: Unique identifier for the game event
+            tests:
+              - not_null
+          - name: player_id
+            description: Unique identifier for the player
+            tests:
+              - not_null
+          - name: player_name
+            description: Player's name
+          - name: team_id
+            description: ID of the team
+            tests:
+              - not_null
+          - name: team_name
+            description: Team's name
+          - name: period
+            description: Game period
+          - name: minutes_remaining
+            description: Minutes remaining in the period
+          - name: seconds_remaining
+            description: Seconds remaining in the period
+          - name: event_type
+            description: Type of event (Made Shot, Missed Shot)
+          - name: action_type
+            description: Action type (Running Layup Shot, etc.)
+          - name: shot_type
+            description: Shot type (2PT Field Goal, 3PT Field Goal)
+          - name: shot_zone_basic
+            description: Basic shot zone (Restricted Area, In The Paint, etc.)
+          - name: shot_zone_area
+            description: Shot zone area (Center, Left Side, Right Side, etc.)
+          - name: shot_zone_range
+            description: Shot zone range (Less Than 8 ft, 8-16 ft, etc.)
+          - name: shot_distance
+            description: Distance in feet
+          - name: loc_x
+            description: X coordinate on court
+          - name: loc_y
+            description: Y coordinate on court
+          - name: shot_attempted_flag
+            description: 1 if shot was attempted
+          - name: shot_made_flag
+            description: 1 if shot was made
+          - name: game_date
+            description: Date of the game
+          - name: home_team
+            description: Home team abbreviation
+          - name: away_team
+            description: Away team abbreviation
+          - name: season
+            description: NBA season
+            tests:
+              - not_null
+
+      - name: player_tracking_box_scores
+        description: Player tracking statistics for each player in each game
+        columns:
+          - name: game_id
+            description: Unique identifier for the game
+            tests:
+              - not_null
+          - name: team_id
+            description: ID of the team
+            tests:
+              - not_null
+          - name: player_id
+            description: Unique identifier for the player
+            tests:
+              - not_null
+          - name: player_name
+            description: Player's name
+            tests:
+              - not_null
+          - name: start_position
+            description: Player's starting position
+          - name: minutes_played
+            description: Minutes played in the game
+          - name: speed
+            description: Average speed in miles per hour
+          - name: distance
+            description: Distance traveled in miles
+          - name: offensive_rebounds
+            description: Number of offensive rebounds
+          - name: defensive_rebounds
+            description: Number of defensive rebounds
+          - name: rebounds
+            description: Total rebounds
+          - name: touches
+            description: Number of touches
+          - name: secondary_assists
+            description: Number of secondary assists
+          - name: free_throw_assists
+            description: Number of free throw assists
+          - name: passes
+            description: Number of passes
+          - name: assists
+            description: Number of assists
+          - name: contested_field_goals_made
+            description: Contested field goals made
+          - name: contested_field_goals_attempted
+            description: Contested field goals attempted
+          - name: contested_field_goal_pct
+            description: Contested field goal percentage
+          - name: uncontested_field_goals_made
+            description: Uncontested field goals made
+          - name: uncontested_field_goals_attempted
+            description: Uncontested field goals attempted
+          - name: uncontested_field_goal_pct
+            description: Uncontested field goal percentage
+          - name: field_goal_pct
+            description: Overall field goal percentage
+          - name: defended_field_goals_made
+            description: Defended field goals made
+          - name: defended_field_goals_attempted
+            description: Defended field goals attempted
+          - name: defended_field_goal_pct
+            description: Defended field goal percentage
+
+      - name: lineups
+        description: Lineup statistics from LeagueDashLineups endpoint
+        columns:
+          - name: group_id
+            description: Unique identifier for the lineup
+            tests:
+              - not_null
+          - name: group_name
+            description: Lineup name/description
+          - name: team_id
+            description: ID of the team
+          - name: team_name
+            description: Team's name
+          - name: season
+            description: NBA season
+            tests:
+              - not_null
+          - name: games_played
+            description: Number of games played by this lineup
+          - name: wins
+            description: Number of wins by this lineup
+          - name: losses
+            description: Number of losses by this lineup
+          - name: minutes_played
+            description: Total minutes played by this lineup
+          - name: off_rating
+            description: Offensive rating for this lineup
+          - name: def_rating
+            description: Defensive rating for this lineup
+          - name: net_rating
+            description: Net rating for this lineup
+          - name: ast_pct
+            description: Assist percentage for this lineup
+          - name: ast_to
+            description: Assist to turnover ratio for this lineup
+          - name: ast_ratio
+            description: Assist ratio for this lineup
+          - name: oreb_pct
+            description: Offensive rebound percentage for this lineup
+          - name: dreb_pct
+            description: Defensive rebound percentage for this lineup
+          - name: reb_pct
+            description: Rebound percentage for this lineup
+          - name: tm_tov_pct
+            description: Team turnover percentage for this lineup
+          - name: efg_pct
+            description: Effective field goal percentage for this lineup
+          - name: ts_pct
+            description: True shooting percentage for this lineup
+          - name: usg_pct
+            description: Usage percentage for this lineup
+          - name: e_usg_pct
+            description: Estimated usage percentage for this lineup
+          - name: e_pace
+            description: Estimated pace for this lineup
+          - name: pace
+            description: Pace for this lineup
+          - name: pace_per40
+            description: Pace per 40 minutes for this lineup
+          - name: poss
+            description: Possessions for this lineup
+          - name: pie
+            description: Player impact estimate for this lineup
+
+      - name: lineup_shot_data
+        description: Shot data for specific lineups from ShotChartLineupDetail endpoint
+        columns:
+          - name: group_id
+            description: Unique identifier for the lineup
+            tests:
+              - not_null
+          - name: season
+            description: NBA season
+            tests:
+              - not_null
+          - name: game_id
+            description: Unique identifier for the game
+          - name: game_event_id
+            description: Unique identifier for the game event
+          - name: player_id
+            description: Unique identifier for the player
+          - name: player_name
+            description: Player's name
+          - name: team_id
+            description: ID of the team
+          - name: team_name
+            description: Team's name
+          - name: period
+            description: Game period
+          - name: minutes_remaining
+            description: Minutes remaining in the period
+          - name: seconds_remaining
+            description: Seconds remaining in the period
+          - name: event_type
+            description: Type of event (Made Shot, Missed Shot)
+          - name: action_type
+            description: Action type (Running Layup Shot, etc.)
+          - name: shot_type
+            description: Shot type (2PT Field Goal, 3PT Field Goal)
+          - name: shot_zone_basic
+            description: Basic shot zone (Restricted Area, In The Paint, etc.)
+          - name: shot_zone_area
+            description: Shot zone area (Center, Left Side, Right Side, etc.)
+          - name: shot_zone_range
+            description: Shot zone range (Less Than 8 ft, 8-16 ft, etc.)
+          - name: shot_distance
+            description: Distance in feet
+          - name: loc_x
+            description: X coordinate on court
+          - name: loc_y
+            description: Y coordinate on court
+          - name: shot_attempted_flag
+            description: 1 if shot was attempted
+          - name: shot_made_flag
+            description: 1 if shot was made
+          - name: game_date
+            description: Date of the game
+          - name: home_team
+            description: Home team abbreviation
+          - name: away_team
+            description: Away team abbreviation
+
+      - name: box_score_usage
+        description: Usage statistics for each player in each game
+        columns:
+          - name: game_id
+            description: Unique identifier for the game
+            tests:
+              - not_null
+          - name: team_id
+            description: ID of the team
+            tests:
+              - not_null
+          - name: player_id
+            description: Unique identifier for the player
+            tests:
+              - not_null
+          - name: player_name
+            description: Player's name
+            tests:
+              - not_null
+          - name: start_position
+            description: Player's starting position
+          - name: minutes_played
+            description: Minutes played in the game
+          - name: usg_pct
+            description: Usage percentage
+          - name: pct_fgm
+            description: Percentage of team field goals made
+          - name: pct_fga
+            description: Percentage of team field goals attempted
+          - name: pct_fg3m
+            description: Percentage of team three pointers made
+          - name: pct_fg3a
+            description: Percentage of team three pointers attempted
+          - name: pct_ftm
+            description: Percentage of team free throws made
+          - name: pct_fta
+            description: Percentage of team free throws attempted
+          - name: pct_oreb
+            description: Percentage of team offensive rebounds
+          - name: pct_dreb
+            description: Percentage of team defensive rebounds
+          - name: pct_reb
+            description: Percentage of team rebounds
+          - name: pct_ast
+            description: Percentage of team assists
+          - name: pct_tov
+            description: Percentage of team turnovers
+          - name: pct_stl
+            description: Percentage of team steals
+          - name: pct_blk
+            description: Percentage of team blocks
+          - name: pct_blka
+            description: Percentage of team blocks against
+          - name: pct_pf
+            description: Percentage of team personal fouls
+          - name: pct_pfd
+            description: Percentage of team personal fouls drawn
+          - name: pct_pts
+            description: Percentage of team points

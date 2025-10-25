@@ -1,0 +1,38 @@
+{{
+  config(
+    materialized='view'
+  )
+}}
+
+select
+    group_id,
+    group_name,
+    team_id,
+    team_name,
+    season,
+    games_played,
+    wins,
+    losses,
+    minutes_played,
+    off_rating,
+    def_rating,
+    net_rating,
+    ast_pct,
+    ast_to,
+    ast_ratio,
+    oreb_pct,
+    dreb_pct,
+    reb_pct,
+    tm_tov_pct,
+    efg_pct,
+    ts_pct,
+    usg_pct,
+    e_usg_pct,
+    e_pace,
+    pace,
+    pace_per40,
+    poss,
+    pie,
+    created_at,
+    updated_at
+from {{ source('nba_raw', 'lineups') }} 
