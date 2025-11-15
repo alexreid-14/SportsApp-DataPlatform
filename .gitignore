@@ -6,14 +6,14 @@ profiles.yml
 /.dbt/
 
 # SQL / artifacts
-*.sql
 *.csv
 *.parquet
 
 # Python
 __pycache__/
 *.py[cod]
-venv/
+.python-version
+.venv/
 .env
 
 # VSCode

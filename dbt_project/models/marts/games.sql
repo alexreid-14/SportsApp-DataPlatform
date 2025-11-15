@@ -95,7 +95,6 @@ from home
 join away
     on home.game_id = away.game_id
     and home.team_id != away.team_id
-order by home.game_date;
 
-order by home.game_date;
+
 
