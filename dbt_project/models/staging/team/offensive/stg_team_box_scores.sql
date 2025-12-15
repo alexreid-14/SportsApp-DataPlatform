@@ -1,11 +1,11 @@
-with game_defensive_stats as (
-    select 
+with game_offensive_stats as (
+    select
         g.game_id,
-        g.team_id, 
+        g.team_id
     from {{ ref('stg_games') }} g
 )
 
-select 
+select
     g.game_id,
     g.team_id,
     sum(bs.field_goals_made) as field_goals_made,
@@ -22,7 +22,7 @@ select
     sum(bs.blocks) as blocks,
     sum(bs.turnovers) as turnovers,
     sum(bs.personal_fouls) as personal_fouls
-from game_defensive_stats g
-left join {{ ref('stg_box_scores') }} bs 
+from game_offensive_stats g
+left join {{ ref('stg_box_scores') }} bs
     on g.game_id = bs.game_id and g.team_id = bs.team_id
 group by g.game_id, g.team_id

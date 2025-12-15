@@ -4,6 +4,7 @@ dbt_packages/
 logs/
 profiles.yml
 /.dbt/
+dbt_internal_packages/
 
 # SQL / artifacts
 *.csv

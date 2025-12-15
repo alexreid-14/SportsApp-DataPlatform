@@ -1,9 +1,9 @@
 with source as (
     select *
     from {{ source('nba', 'advanced_box_scores') }}
-)
+),
 
-with players as (
+players as (
     select * from {{ ref('stg_players') }}
 )
 
@@ -38,4 +38,4 @@ select
     s.poss,
     s.pie
 from source s
-left join players p on s.player_id = p.player_id 
+left join players p on s.player_id = p.player_id

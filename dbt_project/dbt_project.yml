@@ -18,10 +18,10 @@ clean-targets:
 
 models:
   nba_analytics:
-    materialized: table
+    +materialized: table
     staging:
       +materialized: view
     intermediate:
       +materialized: table
     marts:
-      +materialized: table 
+      +materialized: table

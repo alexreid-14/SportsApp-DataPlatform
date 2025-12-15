@@ -3,16 +3,16 @@ with player_games as (
 ),
 
 lineup_shot_data as (
-    select* from {{ ref('stg_lineup_shot_data') }}
-)
+    select * from {{ ref('stg_lineup_shot_data') }}
+),
 
 player_stats as (
-    select 
+    select
         pg.game_id,
-        pg.game_date, 
-        pg.season, 
+        pg.game_date,
+        pg.season,
         pg.player_id,
-        ls.shot_zone_basic, 
+        ls.shot_zone_basic,
         ls.shot_zone_range,
         ls.shot_attempted_flag,
         ls.shot_made_flag
@@ -23,51 +23,52 @@ player_stats as (
 shot_zones as (
     select
         game_id,
-        game_date, 
+        game_date,
         season,
         player_id,
-        shot_zone_basic,
-        count(case when shot_zone_basic = 'Above the Break 3' and shot_attempted_flag = 1 then 1 end) as above_the_break_3_attempted_count
+        count(case when shot_zone_basic = 'Above the Break 3' and shot_attempted_flag = 1 then 1 end) as above_the_break_3_attempted_count,
         count(case when shot_zone_basic = 'Above the Break 3' and shot_made_flag = 1 then 1 end) as above_the_break_3_made_count,
-        count(case when shot_zone_basic = 'Above the Break 3' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_basic = 'Above the Break 3' and shot_attempted_flag = 1 then 1 end) as above_the_break_3_pct,
+        count(case when shot_zone_basic = 'Above the Break 3' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_basic = 'Above the Break 3' and shot_attempted_flag = 1 then 1 end), 0) as above_the_break_3_pct,
         count(case when shot_zone_basic = 'Mid-Range' and shot_attempted_flag = 1 then 1 end) as mid_range_attempted_count,
         count(case when shot_zone_basic = 'Mid-Range' and shot_made_flag = 1 then 1 end) as mid_range_made_count,
-        count(case when shot_zone_basic = 'Mid-Range' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_basic = 'Mid-Range' and shot_attempted_flag = 1 then 1 end) as mid_range_pct,
+        count(case when shot_zone_basic = 'Mid-Range' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_basic = 'Mid-Range' and shot_attempted_flag = 1 then 1 end), 0) as mid_range_pct,
         count(case when shot_zone_basic = 'In The Paint (Non-RA)' and shot_attempted_flag = 1 then 1 end) as in_the_paint_non_ra_attempted_count,
         count(case when shot_zone_basic = 'In The Paint (Non-RA)' and shot_made_flag = 1 then 1 end) as in_the_paint_non_ra_made_count,
-        count(case when shot_zone_basic = 'In The Paint (Non-RA)' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_basic = 'In The Paint (Non-RA)' and shot_attempted_flag = 1 then 1 end) as in_the_paint_non_ra_pct,
+        count(case when shot_zone_basic = 'In The Paint (Non-RA)' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_basic = 'In The Paint (Non-RA)' and shot_attempted_flag = 1 then 1 end), 0) as in_the_paint_non_ra_pct,
         count(case when shot_zone_basic = 'Restricted Area' and shot_attempted_flag = 1 then 1 end) as restricted_area_attempted_count,
         count(case when shot_zone_basic = 'Restricted Area' and shot_made_flag = 1 then 1 end) as restricted_area_made_count,
-        count(case when shot_zone_basic = 'Restricted Area' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_basic = 'Restricted Area' and shot_attempted_flag = 1 then 1 end) as restricted_area_pct,
+        count(case when shot_zone_basic = 'Restricted Area' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_basic = 'Restricted Area' and shot_attempted_flag = 1 then 1 end), 0) as restricted_area_pct,
         count(case when shot_zone_basic = 'Right Corner 3' and shot_attempted_flag = 1 then 1 end) as right_corner_3_attempted_count,
         count(case when shot_zone_basic = 'Right Corner 3' and shot_made_flag = 1 then 1 end) as right_corner_3_made_count,
-        count(case when shot_zone_basic = 'Right Corner 3' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_basic = 'Right Corner 3' and shot_attempted_flag = 1 then 1 end) as right_corner_3_pct,
+        count(case when shot_zone_basic = 'Right Corner 3' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_basic = 'Right Corner 3' and shot_attempted_flag = 1 then 1 end), 0) as right_corner_3_pct,
         count(case when shot_zone_basic = 'Left Corner 3' and shot_attempted_flag = 1 then 1 end) as left_corner_3_attempted_count,
         count(case when shot_zone_basic = 'Left Corner 3' and shot_made_flag = 1 then 1 end) as left_corner_3_made_count,
-        count(case when shot_zone_basic = 'Left Corner 3' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_basic = 'Left Corner 3' and shot_attempted_flag = 1 then 1 end) as left_corner_3_pct,
+        count(case when shot_zone_basic = 'Left Corner 3' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_basic = 'Left Corner 3' and shot_attempted_flag = 1 then 1 end), 0) as left_corner_3_pct,
         count(case when shot_zone_range = 'Less Than 8 ft' and shot_attempted_flag = 1 then 1 end) as less_than_8_ft_attempted_count,
         count(case when shot_zone_range = 'Less Than 8 ft' and shot_made_flag = 1 then 1 end) as less_than_8_ft_made_count,
-        count(case when shot_zone_range = 'Less Than 8 ft' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_range = 'Less Than 8 ft' and shot_attempted_flag = 1 then 1 end) as less_than_8_ft_pct,
-        count(case when shot_zone_range = '8-16 ft' and shot_attempted_flag = 1 then 1 end) as 8_to_16_ft_attempted_count,
-        count(case when shot_zone_range = '8-16 ft' and shot_made_flag = 1 then 1 end) as 8_to_16_ft_made_count,
-        count(case when shot_zone_range = '8-16 ft' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_range = '8-16 ft' and shot_attempted_flag = 1 then 1 end) as 8_to_16_ft_pct,
-        count(case when shot_zone_range = '16-24 ft' and shot_attempted_flag = 1 then 1 end) as 16_to_24_ft_attempted_count,
-        count(case when shot_zone_range = '16-24 ft' and shot_made_flag = 1 then 1 end) as 16_to_24_ft_made_count,
-        count(case when shot_zone_range = '16-24 ft' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_range = '16-24 ft' and shot_attempted_flag = 1 then 1 end) as 16_to_24_ft_pct,
-        count(case when shot_zone_range = '24+ ft' and shot_attempted_flag = 1 then 1 end) as 24_plus_ft_attempted_count,
-        count(case when shot_zone_range = '24+ ft' and shot_made_flag = 1 then 1 end) as 24_plus_ft_made_count,
-        count(case when shot_zone_range = '24+ ft' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_range = '24+ ft' and shot_attempted_flag = 1 then 1 end) as 24_plus_ft_pct,
+        count(case when shot_zone_range = 'Less Than 8 ft' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_range = 'Less Than 8 ft' and shot_attempted_flag = 1 then 1 end), 0) as less_than_8_ft_pct,
+        count(case when shot_zone_range = '8-16 ft' and shot_attempted_flag = 1 then 1 end) as ft_8_to_16_attempted_count,
+        count(case when shot_zone_range = '8-16 ft' and shot_made_flag = 1 then 1 end) as ft_8_to_16_made_count,
+        count(case when shot_zone_range = '8-16 ft' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_range = '8-16 ft' and shot_attempted_flag = 1 then 1 end), 0) as ft_8_to_16_pct,
+        count(case when shot_zone_range = '16-24 ft' and shot_attempted_flag = 1 then 1 end) as ft_16_to_24_attempted_count,
+        count(case when shot_zone_range = '16-24 ft' and shot_made_flag = 1 then 1 end) as ft_16_to_24_made_count,
+        count(case when shot_zone_range = '16-24 ft' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_range = '16-24 ft' and shot_attempted_flag = 1 then 1 end), 0) as ft_16_to_24_pct,
+        count(case when shot_zone_range = '24+ ft' and shot_attempted_flag = 1 then 1 end) as ft_24_plus_attempted_count,
+        count(case when shot_zone_range = '24+ ft' and shot_made_flag = 1 then 1 end) as ft_24_plus_made_count,
+        count(case when shot_zone_range = '24+ ft' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_range = '24+ ft' and shot_attempted_flag = 1 then 1 end), 0) as ft_24_plus_pct,
         count(case when shot_zone_range = 'Backcourt' and shot_attempted_flag = 1 then 1 end) as backcourt_attempted_count,
         count(case when shot_zone_range = 'Backcourt' and shot_made_flag = 1 then 1 end) as backcourt_made_count,
-        count(case when shot_zone_range = 'Backcourt' and shot_made_flag = 1 then 1 end) / count(case when shot_zone_range = 'Backcourt' and shot_attempted_flag = 1 then 1 end) as backcourt_pct,
+        count(case when shot_zone_range = 'Backcourt' and shot_made_flag = 1 then 1 end) / NULLIF(count(case when shot_zone_range = 'Backcourt' and shot_attempted_flag = 1 then 1 end), 0) as backcourt_pct
     from player_stats
-    group by game_id, player_id, shot_zone_basic
+    group by game_id, game_date, season, player_id
 ),
 
 rolling_stats as (
     select
         game_id,
-        player_id, 
+        game_date,
+        season,
+        player_id,
         above_the_break_3_attempted_count,
         above_the_break_3_made_count,
         above_the_break_3_pct,
@@ -89,15 +90,15 @@ rolling_stats as (
         less_than_8_ft_attempted_count,
         less_than_8_ft_made_count,
         less_than_8_ft_pct,
-        8_to_16_ft_attempted_count,
-        8_to_16_ft_made_count,
-        8_to_16_ft_pct,
-        16_to_24_ft_attempted_count,
-        16_to_24_ft_made_count,
-        16_to_24_ft_pct,
-        24_plus_ft_attempted_count,
-        24_plus_ft_made_count,
-        24_plus_ft_pct,
+        ft_8_to_16_attempted_count,
+        ft_8_to_16_made_count,
+        ft_8_to_16_pct,
+        ft_16_to_24_attempted_count,
+        ft_16_to_24_made_count,
+        ft_16_to_24_pct,
+        ft_24_plus_attempted_count,
+        ft_24_plus_made_count,
+        ft_24_plus_pct,
         backcourt_attempted_count,
         backcourt_made_count,
         backcourt_pct,
@@ -123,19 +124,19 @@ rolling_stats as (
         avg(less_than_8_ft_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_less_than_8_ft_attempted_count_season_to_date,
         avg(less_than_8_ft_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_less_than_8_ft_made_count_season_to_date,
         avg(less_than_8_ft_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_less_than_8_ft_pct_season_to_date,
-        avg(8_to_16_ft_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_8_to_16_ft_attempted_count_season_to_date,
-        avg(8_to_16_ft_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_8_to_16_ft_made_count_season_to_date,
-        avg(8_to_16_ft_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_8_to_16_ft_pct_season_to_date,
-        avg(16_to_24_ft_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_16_to_24_ft_attempted_count_season_to_date,
-        avg(16_to_24_ft_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_16_to_24_ft_made_count_season_to_date,
-        avg(16_to_24_ft_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_16_to_24_ft_pct_season_to_date,
-        avg(24_plus_ft_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_24_plus_ft_attempted_count_season_to_date,
-        avg(24_plus_ft_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_24_plus_ft_made_count_season_to_date,
-        avg(24_plus_ft_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_24_plus_ft_pct_season_to_date,
+        avg(ft_8_to_16_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_8_to_16_attempted_count_season_to_date,
+        avg(ft_8_to_16_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_8_to_16_made_count_season_to_date,
+        avg(ft_8_to_16_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_8_to_16_pct_season_to_date,
+        avg(ft_16_to_24_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_16_to_24_attempted_count_season_to_date,
+        avg(ft_16_to_24_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_16_to_24_made_count_season_to_date,
+        avg(ft_16_to_24_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_16_to_24_pct_season_to_date,
+        avg(ft_24_plus_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_24_plus_attempted_count_season_to_date,
+        avg(ft_24_plus_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_24_plus_made_count_season_to_date,
+        avg(ft_24_plus_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_24_plus_pct_season_to_date,
         avg(backcourt_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_backcourt_attempted_count_season_to_date,
         avg(backcourt_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_backcourt_made_count_season_to_date,
-        avg(backcourt_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_backcourt_pct_season_to_date,
-        from shot_zones
+        avg(backcourt_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_backcourt_pct_season_to_date
+    from shot_zones
 )
 
 select * from rolling_stats

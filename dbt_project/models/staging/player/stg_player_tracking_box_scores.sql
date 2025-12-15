@@ -1,9 +1,9 @@
 with source as (
     select *
     from {{ source('nba', 'player_tracking_box_scores') }}
-)
+),
 
-with players as (
+players as (
     select * from {{ ref('stg_players') }}
 )
 
@@ -17,9 +17,9 @@ select
     s.minutes_played,
     s.speed,
     s.distance,
-    s.offensive_rebounds,
-    s.defensive_rebounds,
-    s.rebounds,
+    s.offensive_rebounds_contested,
+    s.defensive_rebounds_contested,
+    s.rebounds_contested,
     s.touches,
     s.secondary_assists,
     s.free_throw_assists,
@@ -36,4 +36,4 @@ select
     s.defended_field_goals_attempted,
     s.defended_field_goal_pct
 from source s
-left join players p on s.player_id = p.player_id 
+left join players p on s.player_id = p.player_id

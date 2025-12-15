@@ -1,13 +1,16 @@
 with game_defensive_stats as (
-    select 
-        g.game_id,
-        g.team_id, 
-        case when g.team_id = g.home_team_id then g.away_team_id else g.home_team_id end as opponent_team_id
-    from {{ ref('stg_games') }} g
+    select
+        g1.game_id,
+        g1.team_id,
+        g2.team_id as opponent_team_id
+    from {{ ref('stg_games') }} g1
+    join {{ ref('stg_games') }} g2
+        on g1.game_id = g2.game_id
+        and g1.team_id != g2.team_id
 ),
 
 team_defensive_stats as (
-    select 
+    select
         g.game_id,
         g.team_id,
         g.opponent_team_id,
@@ -27,7 +30,7 @@ team_defensive_stats as (
         sum(bs.turnovers) as turnovers,
         sum(bs.personal_fouls) as personal_fouls
     from game_defensive_stats g
-    left join {{ ref('stg_box_scores') }} bs 
+    left join {{ ref('stg_box_scores') }} bs
         on g.game_id = bs.game_id and g.opponent_team_id = bs.team_id
     group by g.game_id, g.team_id, g.opponent_team_id, bs.player_position
 )

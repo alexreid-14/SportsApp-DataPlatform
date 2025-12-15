@@ -1,5 +1,5 @@
 with source as (
-    select * from {{ source('nba_raw', 'team_advanced_box_scores') }}
+    select * from {{ source('nba', 'team_advanced_box_scores') }}
 )
 
 select
@@ -35,4 +35,4 @@ select
     created_at,
     updated_at,
     concat(game_id, '-', team_id) as team_advanced_box_score_id
-from source 
+from source

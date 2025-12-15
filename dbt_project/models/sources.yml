@@ -508,3 +508,127 @@ sources:
             description: Percentage of team personal fouls drawn
           - name: pct_pts
             description: Percentage of team points
+
+      - name: team_box_scores
+        description: Traditional box score statistics for each team in each game
+        columns:
+          - name: game_id
+            description: Unique identifier for the game
+            tests:
+              - not_null
+          - name: team_id
+            description: ID of the team
+            tests:
+              - not_null
+          - name: team_name
+            description: Team's name
+          - name: team_abbreviation
+            description: Team abbreviation
+          - name: team_city
+            description: Team's city
+          - name: minutes_played
+            description: Minutes played in the game
+          - name: field_goals_made
+            description: Number of field goals made
+          - name: field_goals_attempted
+            description: Number of field goals attempted
+          - name: field_goal_pct
+            description: Field goal percentage
+          - name: three_pointers_made
+            description: Number of three pointers made
+          - name: three_pointers_attempted
+            description: Number of three pointers attempted
+          - name: three_pointer_pct
+            description: Three pointer percentage
+          - name: free_throws_made
+            description: Number of free throws made
+          - name: free_throws_attempted
+            description: Number of free throws attempted
+          - name: free_throw_pct
+            description: Free throw percentage
+          - name: offensive_rebounds
+            description: Number of offensive rebounds
+          - name: defensive_rebounds
+            description: Number of defensive rebounds
+          - name: rebounds
+            description: Total rebounds
+          - name: assists
+            description: Number of assists
+          - name: steals
+            description: Number of steals
+          - name: blocks
+            description: Number of blocks
+          - name: turnovers
+            description: Number of turnovers
+          - name: personal_fouls
+            description: Number of personal fouls
+          - name: points
+            description: Total points scored
+          - name: plus_minus
+            description: Plus/minus rating
+
+      - name: team_advanced_box_scores
+        description: Advanced box score statistics for each team in each game
+        columns:
+          - name: game_id
+            description: Unique identifier for the game
+            tests:
+              - not_null
+          - name: team_id
+            description: ID of the team
+            tests:
+              - not_null
+          - name: team_name
+            description: Team's name
+          - name: team_abbreviation
+            description: Team abbreviation
+          - name: team_city
+            description: Team's city
+          - name: minutes_played
+            description: Minutes played in the game
+          - name: off_rating
+            description: Offensive rating
+          - name: def_rating
+            description: Defensive rating
+          - name: net_rating
+            description: Net rating
+          - name: e_off_rating
+            description: Estimated offensive rating
+          - name: e_def_rating
+            description: Estimated defensive rating
+          - name: e_net_rating
+            description: Estimated net rating
+          - name: ast_pct
+            description: Assist percentage
+          - name: ast_to
+            description: Assist to turnover ratio
+          - name: ast_ratio
+            description: Assist ratio
+          - name: oreb_pct
+            description: Offensive rebound percentage
+          - name: dreb_pct
+            description: Defensive rebound percentage
+          - name: reb_pct
+            description: Rebound percentage
+          - name: tm_tov_pct
+            description: Team turnover percentage
+          - name: e_tm_tov_pct
+            description: Estimated team turnover percentage
+          - name: efg_pct
+            description: Effective field goal percentage
+          - name: ts_pct
+            description: True shooting percentage
+          - name: usg_pct
+            description: Usage percentage
+          - name: e_usg_pct
+            description: Estimated usage percentage
+          - name: e_pace
+            description: Estimated pace
+          - name: pace
+            description: Pace
+          - name: pace_per40
+            description: Pace per 40 minutes
+          - name: poss
+            description: Possessions
+          - name: pie
+            description: Player impact estimate

@@ -7,9 +7,9 @@
 with source as (
     select *
     from {{ source('nba', 'lineup_shot_data') }}
-)
+),
 
-with players as (
+players as (
     select * from {{ ref('stg_players') }}
 )
 
@@ -41,4 +41,4 @@ select
     s.home_team,
     s.away_team
 from source s
-left join players p on s.player_id = p.player_id 
+left join players p on s.player_id = p.player_id

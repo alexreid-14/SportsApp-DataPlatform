@@ -1,9 +1,9 @@
 with source as (
     select *
     from {{ source('nba', 'box_score_usage') }}
-)
+),
 
-with players as (
+players as (
     select * from {{ ref('stg_players') }}
 )
 
@@ -36,4 +36,4 @@ select
     s.pct_pfd,
     s.pct_pts
 from source s
-left join players p on s.player_id = p.player_id 
+left join players p on s.player_id = p.player_id

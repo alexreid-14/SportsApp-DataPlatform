@@ -24,9 +24,10 @@ player_team_periods as (
         game_date,
         season,
         season_year,
+        minutes_played,
         -- Create a row number to identify consecutive games with the same team
         row_number() over (
-            partition by player_id, team_id 
+            partition by player_id, team_id
             order by game_date
         ) as game_sequence,
         -- Calculate the first game date for this player-team combination
@@ -63,11 +64,11 @@ player_team_summary as (
         min(season_year) as first_season_year,
         max(season_year) as last_season_year
     from player_team_periods
-    group by 
-        player_id, 
-        player_name, 
-        team_id, 
-        first_game_date, 
+    group by
+        player_id,
+        player_name,
+        team_id,
+        first_game_date,
         last_game_date
 )
 
@@ -89,26 +90,26 @@ select
     pt.first_season_year,
     pt.last_season_year,
     -- Create a season range string
-    case 
-        when pt.first_season = pt.last_season 
-        then pt.first_season 
-        else pt.first_season || ' - ' || pt.last_season 
+    case
+        when pt.first_season = pt.last_season
+        then pt.first_season
+        else pt.first_season || ' - ' || pt.last_season
     end as season_range,
     -- Calculate number of seasons played for this team
     (pt.last_season_year - pt.first_season_year + 1) as seasons_played,
     -- Flag if this is the player's current team (most recent)
-    case 
+    case
         when pt.last_game_date = (
-            select max(last_game_date) 
-            from player_team_summary pts2 
+            select max(last_game_date)
+            from player_team_summary pts2
             where pts2.player_id = pt.player_id
-        ) 
-        then true 
-        else false 
+        )
+        then true
+        else false
     end as is_current_team
 from player_team_summary pt
 left join {{ ref('stg_teams') }} t
     on pt.team_id = t.team_id
-order by 
-    pt.player_id, 
-    pt.first_game_date 
+order by
+    pt.player_id,
+    pt.first_game_date

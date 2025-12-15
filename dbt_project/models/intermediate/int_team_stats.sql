@@ -63,7 +63,7 @@ team_defense_game as (
         tda.pace_per40,
         tda.poss,
         tda.pie
-    from team_def_box_scores tds 
+    from team_def_box_scores tds
     join team_def_adv_box_scores tda on tds.game_id = tda.game_id and tds.team_id = tda.team_id
     join games g on g.game_id = tds.game_id
 ),
@@ -75,7 +75,7 @@ team_offensive_game as (
         g.season,
         g.game_date,
         tbs.team_id,
-        case when g.team_id = g.home_team_id then g.away_team_id else g.home_team_id end as opponent_team_id,
+        case when tbs.team_id = g.home_team_id then g.away_team_id else g.home_team_id end as opponent_team_id,
         tbs.field_goals_made as fgm_scored,
         tbs.field_goals_attempted as fga_scored,
         tbs.three_pointers_made as three_pm_scored,
@@ -113,7 +113,7 @@ team_offensive_game as (
         tba.pace_per40,
         tba.poss,
         tba.pie
-    from team_box_scores tbs 
+    from team_box_scores tbs
     join team_advanced_box_scores tba on tbs.game_id = tba.game_id and tbs.team_id = tba.team_id
     join games g on g.game_id = tbs.game_id
 ),
@@ -421,7 +421,7 @@ rolling_team_offense as (
 )
 
 -- Final select combining offensive and defensive rolling stats
-select 
+select
     rtd.game_id,
     rtd.game_date,
     rtd.season,
@@ -708,5 +708,5 @@ select
     rto.avg_off_poss_vs_opp_last_3,
     rto.avg_off_pie_vs_opp_last_3
 from rolling_team_defense rtd
-join rolling_team_offense rto 
+join rolling_team_offense rto
     on rtd.game_id = rto.game_id and rtd.team_id = rto.team_id

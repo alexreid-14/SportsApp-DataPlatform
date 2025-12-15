@@ -1,9 +1,7 @@
-{{
-  config(
-    materialized='view'
-  )
-}}
-
+with source as (
+    select *
+    from {{ source('nba', 'lineups') }}
+)
 select
     group_id,
     group_name,
@@ -35,4 +33,4 @@ select
     pie,
     created_at,
     updated_at
-from {{ source('nba_raw', 'lineups') }} 
+from source
