@@ -14,7 +14,6 @@ players as (
 )
 
 select
-    s.group_id,
     s.season,
     s.game_id,
     s.game_event_id,
