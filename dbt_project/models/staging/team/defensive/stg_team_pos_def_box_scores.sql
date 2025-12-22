@@ -14,7 +14,7 @@ team_defensive_stats as (
         g.game_id,
         g.team_id,
         g.opponent_team_id,
-        bs.player_position,
+        p.player_position,
         sum(bs.field_goals_made) as field_goals_made,
         sum(bs.field_goals_attempted) as field_goals_attempted,
         sum(bs.three_pointers_made) as three_pointers_made,
@@ -32,6 +32,7 @@ team_defensive_stats as (
     from game_defensive_stats g
     left join {{ ref('stg_box_scores') }} bs
         on g.game_id = bs.game_id and g.opponent_team_id = bs.team_id
+    left join players p on bs.player_id = p.player_id
     group by g.game_id, g.team_id, g.opponent_team_id, bs.player_position
 )
 

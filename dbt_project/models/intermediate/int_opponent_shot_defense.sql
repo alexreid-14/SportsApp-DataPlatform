@@ -2,23 +2,15 @@ with player_shot_data as (
     select * from {{ ref('int_player_shots') }}
 ),
 
-games as (
-    select * from {{ ref('games') }}
-),
-
--- Join player shots with games to get team context
+-- Join player shots with box scores to get team context
 player_team_shots as (
     select
         ps.*,
-        pg.opponent_team_id as defensive_team_id,
-        -- Derive the offensive team (player's team) from games table
-        case
-            when pg.opponent_team_id = g.home_team_id then g.away_team_id
-            else g.home_team_id
-        end as offensive_team_id
+        bs.team_id as offensive_team_id,  -- Player's team (shooting)
+        pg.opponent_team_id as defensive_team_id  -- Opponent team (defending)
     from player_shot_data ps
     join {{ ref('player_game') }} pg on ps.game_id = pg.game_id and ps.player_id = pg.player_id
-    join games g on ps.game_id = g.game_id
+    join {{ ref('stg_box_scores') }} bs on ps.game_id = bs.game_id and ps.player_id = bs.player_id
 ),
 
 -- Aggregate shot data by defensive team and shot zones
@@ -35,7 +27,7 @@ team_defensive_shot_performance as (
         case
             when sum(above_the_break_3_attempted_count) > 0
             then sum(above_the_break_3_made_count)::float / sum(above_the_break_3_attempted_count)
-            else 0
+            else null
         end as opp_above_the_break_3_fg_pct,
 
         sum(mid_range_attempted_count) as opp_mid_range_attempted,
@@ -43,7 +35,7 @@ team_defensive_shot_performance as (
         case
             when sum(mid_range_attempted_count) > 0
             then sum(mid_range_made_count)::float / sum(mid_range_attempted_count)
-            else 0
+            else null
         end as opp_mid_range_fg_pct,
 
         sum(in_the_paint_non_ra_attempted_count) as opp_in_the_paint_non_ra_attempted,
@@ -51,7 +43,7 @@ team_defensive_shot_performance as (
         case
             when sum(in_the_paint_non_ra_attempted_count) > 0
             then sum(in_the_paint_non_ra_made_count)::float / sum(in_the_paint_non_ra_attempted_count)
-            else 0
+            else null
         end as opp_in_the_paint_non_ra_fg_pct,
 
         sum(restricted_area_attempted_count) as opp_restricted_area_attempted,
@@ -59,7 +51,7 @@ team_defensive_shot_performance as (
         case
             when sum(restricted_area_attempted_count) > 0
             then sum(restricted_area_made_count)::float / sum(restricted_area_attempted_count)
-            else 0
+            else null
         end as opp_restricted_area_fg_pct,
 
         sum(right_corner_3_attempted_count) as opp_right_corner_3_attempted,
@@ -67,7 +59,7 @@ team_defensive_shot_performance as (
         case
             when sum(right_corner_3_attempted_count) > 0
             then sum(right_corner_3_made_count)::float / sum(right_corner_3_attempted_count)
-            else 0
+            else null
         end as opp_right_corner_3_fg_pct,
 
         sum(left_corner_3_attempted_count) as opp_left_corner_3_attempted,
@@ -75,7 +67,7 @@ team_defensive_shot_performance as (
         case
             when sum(left_corner_3_attempted_count) > 0
             then sum(left_corner_3_made_count)::float / sum(left_corner_3_attempted_count)
-            else 0
+            else null
         end as opp_left_corner_3_fg_pct,
 
         -- Shot range metrics
@@ -84,7 +76,7 @@ team_defensive_shot_performance as (
         case
             when sum(less_than_8_ft_attempted_count) > 0
             then sum(less_than_8_ft_made_count)::float / sum(less_than_8_ft_attempted_count)
-            else 0
+            else null
         end as opp_less_than_8_ft_fg_pct,
 
         sum(ft_8_to_16_attempted_count) as opp_8_to_16_ft_attempted,
@@ -92,7 +84,7 @@ team_defensive_shot_performance as (
         case
             when sum(ft_8_to_16_attempted_count) > 0
             then sum(ft_8_to_16_made_count)::float / sum(ft_8_to_16_attempted_count)
-            else 0
+            else null
         end as opp_8_to_16_ft_fg_pct,
 
         sum(ft_16_to_24_attempted_count) as opp_16_to_24_ft_attempted,
@@ -100,7 +92,7 @@ team_defensive_shot_performance as (
         case
             when sum(ft_16_to_24_attempted_count) > 0
             then sum(ft_16_to_24_made_count)::float / sum(ft_16_to_24_attempted_count)
-            else 0
+            else null
         end as opp_16_to_24_ft_fg_pct,
 
         sum(ft_24_plus_attempted_count) as opp_24_plus_ft_attempted,
@@ -108,7 +100,7 @@ team_defensive_shot_performance as (
         case
             when sum(ft_24_plus_attempted_count) > 0
             then sum(ft_24_plus_made_count)::float / sum(ft_24_plus_attempted_count)
-            else 0
+            else null
         end as opp_24_plus_ft_fg_pct,
 
         sum(backcourt_attempted_count) as opp_backcourt_attempted,
@@ -116,7 +108,7 @@ team_defensive_shot_performance as (
         case
             when sum(backcourt_attempted_count) > 0
             then sum(backcourt_made_count)::float / sum(backcourt_attempted_count)
-            else 0
+            else null
         end as opp_backcourt_fg_pct,
 
         -- Total shots for context
@@ -131,7 +123,7 @@ team_defensive_shot_performance as (
                     restricted_area_made_count + right_corner_3_made_count + left_corner_3_made_count)::float /
                  sum(above_the_break_3_attempted_count + mid_range_attempted_count + in_the_paint_non_ra_attempted_count +
                      restricted_area_attempted_count + right_corner_3_attempted_count + left_corner_3_attempted_count)
-            else 0
+            else null
         end as total_opp_fg_pct
     from player_team_shots
     group by game_id, defensive_team_id, offensive_team_id, season, game_date

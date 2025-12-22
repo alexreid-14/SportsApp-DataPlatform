@@ -2,7 +2,7 @@ with player_games as (
     select * from {{ ref('player_game') }}
 ),
 
-lineup_shot_data as (
+shot_data as (
     select * from {{ ref('stg_shot_data') }}
 ),
 
@@ -24,7 +24,7 @@ player_stats as (
         ls.shot_made_flag
     from player_games pg
     inner join box_scores bs on pg.game_id = bs.game_id and pg.player_id = bs.player_id
-    left join lineup_shot_data ls on pg.game_id = ls.game_id and pg.player_id = ls.player_id
+    left join shot_data ls on pg.game_id = ls.game_id and pg.player_id = ls.player_id
 ),
 
 shot_zones as (

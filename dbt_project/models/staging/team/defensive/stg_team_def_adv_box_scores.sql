@@ -7,6 +7,11 @@ with game_defensive_stats as (
     join {{ ref('stg_games') }} g2
         on g1.game_id = g2.game_id
         and g1.team_id != g2.team_id
+).
+
+advanced_box_scores as (
+    select *
+    from {{ ref('stg_team_advanced_box_scores') }}
 )
 
 select
@@ -38,7 +43,7 @@ select
     bs.poss,
     bs.pie
 from game_defensive_stats g
-left join {{ ref('stg_team_advanced_box_scores') }} bs
+left join advanced_box_scores bs
     on g.game_id = bs.game_id and g.opponent_team_id = bs.team_id
 
 
