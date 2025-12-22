@@ -3,15 +3,11 @@ with source as (
     from {{ source('nba', 'box_scores') }}
 ),
 
-players as (
-    select * from {{ ref('stg_players') }}
-)
 select
     s.game_id,
     s.team_id,
     s.player_id,
     s.player_name,
-    p.position as player_position,
     s.start_position,
     s.field_goals_made,
     s.field_goals_attempted,
@@ -31,4 +27,3 @@ select
     s.plus_minus,
     s.comments
 from source s
-left join players p on s.player_id = p.player_id

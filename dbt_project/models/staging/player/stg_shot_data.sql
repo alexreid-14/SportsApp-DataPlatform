@@ -9,17 +9,12 @@ with source as (
     from {{ source('nba', 'lineup_shot_data') }}
 ),
 
-players as (
-    select * from {{ ref('stg_players') }}
-)
-
 select
     s.season,
     s.game_id,
     s.game_event_id,
     s.player_id,
     s.player_name,
-    p.position as player_position,
     s.team_id,
     s.team_name,
     s.period,
@@ -40,4 +35,3 @@ select
     s.home_team,
     s.away_team
 from source s
-left join players p on s.player_id = p.player_id

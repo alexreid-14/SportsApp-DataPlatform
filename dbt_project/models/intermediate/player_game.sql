@@ -10,14 +10,21 @@ played_box_scores as (
 ),
 
 games as (
-    select *
+    select *,
+        min(game_date) over (partition by season) as season_start_date
     from {{ ref('games') }}
+),
+
+players as (
+    select *
+    from {{ ref('stg_players') }}
 ),
 
 -- Games where the player actually played (for lag)
 player_last_played as (
     select
         bs.player_id,
+        p.player_position,
         g.season,
         g.game_date,
         g.game_id,
@@ -25,6 +32,7 @@ player_last_played as (
         lag(g.game_id) over (partition by bs.player_id, g.season order by g.game_date) as previous_played_game_id
     from played_box_scores bs
     join games g on bs.game_id = g.game_id
+    join players p on bs.player_id = p.player_id
 ),
 
 -- Join all box scores (played or not) to games and use last played info
@@ -32,6 +40,7 @@ player_games as (
     select
         g.game_id,
         bs.player_id,
+        p.player_position,
         g.game_type,
         g.game_date,
         g.season,
@@ -56,7 +65,8 @@ player_games as (
             else g.away_team_losses
         end as team_losses,
         p.previous_played_game_date,
-        p.previous_played_game_id
+        p.previous_played_game_id,
+        g.season_start_date
 
     from games g
     join all_box_scores bs on g.game_id = bs.game_id
@@ -76,7 +86,11 @@ select
     opponent_team_id,
     team_game_number,
     (team_wins::float/team_game_number::float) as team_win_percentage,
-    (game_date - previous_played_game_date) as days_since_previous_game,
+    (game_date - COALESCE(previous_played_game_date, season_start_date)) as days_since_previous_game,
+    case
+        when (game_date - COALESCE(previous_played_game_date, season_start_date)) = 1 then 1
+        else 0
+    end as is_back_to_back,
     previous_played_game_id
 from player_games
 order by player_id, game_date

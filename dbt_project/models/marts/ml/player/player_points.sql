@@ -36,6 +36,8 @@ player_points as (
         pg.team_game_number,
         pg.team_win_percentage,
         pg.days_since_previous_game,
+        pg.is_back_to_back,
+        pg.player_position,
         ----------------------------
         -- Player stats
         ----------------------------
@@ -85,37 +87,6 @@ player_points as (
         psh.avg_ft_24_plus_pct_season_to_date,
         psh.avg_backcourt_attempted_count_season_to_date,
         psh.avg_backcourt_pct_season_to_date,
-
-        -- Last Game
-        -- Box Score
-        ps.avg_points_last_game,
-        ps.avg_fgm_last_game,
-        ps.avg_fga_last_game,
-        ps.avg_3pm_last_game,
-        ps.avg_3pa_last_game,
-        ps.avg_ftm_last_game,
-        ps.avg_fta_last_game,
-        ps.avg_mp_last_game,
-        -- Advanced Box Score
-        ps.avg_off_rating_last_game,
-        ps.avg_e_off_rating_last_game,
-        ps.avg_efg_pct_last_game,
-        ps.avg_ts_pct_last_game,
-        ps.avg_usg_pct_last_game,
-        ps.avg_e_usg_pct_last_game,
-        ps.avg_e_pace_last_game,
-        ps.avg_pace_last_game,
-        ps.avg_pace_per40_last_game,
-        ps.avg_poss_last_game,
-        ps.avg_pie_last_game,
-        -- Usage stats
-        ps.avg_pct_fgm_last_game,
-        ps.avg_pct_fga_last_game,
-        ps.avg_pct_fg3m_last_game,
-        ps.avg_pct_fg3a_last_game,
-        ps.avg_pct_ftm_last_game,
-        ps.avg_pct_fta_last_game,
-        ps.avg_pct_pts_last_game,
 
         -- Last 5 games
         -- Box Score
@@ -179,36 +150,6 @@ player_points as (
         ps.avg_pct_fta_vs_opp_this_season,
         ps.avg_pct_pts_vs_opp_this_season,
 
-        -- Vs opponent last 3 games
-        -- Box Score
-        ps.avg_points_vs_opp_last_3,
-        ps.avg_fgm_vs_opp_last_3,
-        ps.avg_fga_vs_opp_last_3,
-        ps.avg_3pm_vs_opp_last_3,
-        ps.avg_3pa_vs_opp_last_3,
-        ps.avg_ftm_vs_opp_last_3,
-        ps.avg_fta_vs_opp_last_3,
-        ps.avg_mp_vs_opp_last_3,
-        -- Advanced Box Score
-        ps.avg_off_rating_vs_opp_last_3,
-        ps.avg_e_off_rating_vs_opp_last_3,
-        ps.avg_efg_pct_vs_opp_last_3,
-        ps.avg_ts_pct_vs_opp_last_3,
-        ps.avg_usg_pct_vs_opp_last_3,
-        ps.avg_e_usg_pct_vs_opp_last_3,
-        ps.avg_e_pace_vs_opp_last_3,
-        ps.avg_pace_vs_opp_last_3,
-        ps.avg_pace_per40_vs_opp_last_3,
-        ps.avg_poss_vs_opp_last_3,
-        ps.avg_pie_vs_opp_last_3,
-        -- Usage stats
-        ps.avg_pct_fgm_vs_opp_last_3,
-        ps.avg_pct_fga_vs_opp_last_3,
-        ps.avg_pct_fg3m_vs_opp_last_3,
-        ps.avg_pct_fg3a_vs_opp_last_3,
-        ps.avg_pct_ftm_vs_opp_last_3,
-        ps.avg_pct_fta_vs_opp_last_3,
-        ps.avg_pct_pts_vs_opp_last_3,
 
         ----------------------------
         -- Team Stats

@@ -3,7 +3,13 @@ with player_games as (
 ),
 
 lineup_shot_data as (
-    select * from {{ ref('stg_lineup_shot_data') }}
+    select * from {{ ref('stg_shot_data') }}
+),
+
+box_scores as (
+    select game_id, player_id, minutes_played
+    from {{ ref('stg_box_scores') }}
+    where minutes_played is not null and minutes_played > 0
 ),
 
 player_stats as (
@@ -17,6 +23,7 @@ player_stats as (
         ls.shot_attempted_flag,
         ls.shot_made_flag
     from player_games pg
+    inner join box_scores bs on pg.game_id = bs.game_id and pg.player_id = bs.player_id
     left join lineup_shot_data ls on pg.game_id = ls.game_id and pg.player_id = ls.player_id
 ),
 
@@ -103,39 +110,39 @@ rolling_stats as (
         backcourt_made_count,
         backcourt_pct,
         -- Season to date (partition by player_id, season)
-        avg(above_the_break_3_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_above_the_break_3_attempted_count_season_to_date,
-        avg(above_the_break_3_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_above_the_break_3_made_count_season_to_date,
-        avg(above_the_break_3_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_above_the_break_3_pct_season_to_date,
-        avg(mid_range_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_mid_range_attempted_count_season_to_date,
-        avg(mid_range_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_mid_range_made_count_season_to_date,
-        avg(mid_range_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_mid_range_pct_season_to_date,
-        avg(in_the_paint_non_ra_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_in_the_paint_non_ra_attempted_count_season_to_date,
-        avg(in_the_paint_non_ra_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_in_the_paint_non_ra_made_count_season_to_date,
-        avg(in_the_paint_non_ra_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_in_the_paint_non_ra_pct_season_to_date,
-        avg(restricted_area_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_restricted_area_attempted_count_season_to_date,
-        avg(restricted_area_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_restricted_area_made_count_season_to_date,
-        avg(restricted_area_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_restricted_area_pct_season_to_date,
-        avg(right_corner_3_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_right_corner_3_attempted_count_season_to_date,
-        avg(right_corner_3_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_right_corner_3_made_count_season_to_date,
-        avg(right_corner_3_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_right_corner_3_pct_season_to_date,
-        avg(left_corner_3_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_left_corner_3_attempted_count_season_to_date,
-        avg(left_corner_3_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_left_corner_3_made_count_season_to_date,
-        avg(left_corner_3_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_left_corner_3_pct_season_to_date,
-        avg(less_than_8_ft_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_less_than_8_ft_attempted_count_season_to_date,
-        avg(less_than_8_ft_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_less_than_8_ft_made_count_season_to_date,
-        avg(less_than_8_ft_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_less_than_8_ft_pct_season_to_date,
-        avg(ft_8_to_16_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_8_to_16_attempted_count_season_to_date,
-        avg(ft_8_to_16_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_8_to_16_made_count_season_to_date,
-        avg(ft_8_to_16_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_8_to_16_pct_season_to_date,
-        avg(ft_16_to_24_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_16_to_24_attempted_count_season_to_date,
-        avg(ft_16_to_24_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_16_to_24_made_count_season_to_date,
-        avg(ft_16_to_24_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_16_to_24_pct_season_to_date,
-        avg(ft_24_plus_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_24_plus_attempted_count_season_to_date,
-        avg(ft_24_plus_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_24_plus_made_count_season_to_date,
-        avg(ft_24_plus_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_ft_24_plus_pct_season_to_date,
-        avg(backcourt_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_backcourt_attempted_count_season_to_date,
-        avg(backcourt_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_backcourt_made_count_season_to_date,
-        avg(backcourt_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and current row) as avg_backcourt_pct_season_to_date
+        avg(above_the_break_3_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_above_the_break_3_attempted_count_season_to_date,
+        avg(above_the_break_3_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_above_the_break_3_made_count_season_to_date,
+        avg(above_the_break_3_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_above_the_break_3_pct_season_to_date,
+        avg(mid_range_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_mid_range_attempted_count_season_to_date,
+        avg(mid_range_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_mid_range_made_count_season_to_date,
+        avg(mid_range_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_mid_range_pct_season_to_date,
+        avg(in_the_paint_non_ra_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_in_the_paint_non_ra_attempted_count_season_to_date,
+        avg(in_the_paint_non_ra_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_in_the_paint_non_ra_made_count_season_to_date,
+        avg(in_the_paint_non_ra_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_in_the_paint_non_ra_pct_season_to_date,
+        avg(restricted_area_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_restricted_area_attempted_count_season_to_date,
+        avg(restricted_area_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_restricted_area_made_count_season_to_date,
+        avg(restricted_area_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_restricted_area_pct_season_to_date,
+        avg(right_corner_3_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_right_corner_3_attempted_count_season_to_date,
+        avg(right_corner_3_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_right_corner_3_made_count_season_to_date,
+        avg(right_corner_3_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_right_corner_3_pct_season_to_date,
+        avg(left_corner_3_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_left_corner_3_attempted_count_season_to_date,
+        avg(left_corner_3_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_left_corner_3_made_count_season_to_date,
+        avg(left_corner_3_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_left_corner_3_pct_season_to_date,
+        avg(less_than_8_ft_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_less_than_8_ft_attempted_count_season_to_date,
+        avg(less_than_8_ft_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_less_than_8_ft_made_count_season_to_date,
+        avg(less_than_8_ft_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_less_than_8_ft_pct_season_to_date,
+        avg(ft_8_to_16_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_ft_8_to_16_attempted_count_season_to_date,
+        avg(ft_8_to_16_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_ft_8_to_16_made_count_season_to_date,
+        avg(ft_8_to_16_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_ft_8_to_16_pct_season_to_date,
+        avg(ft_16_to_24_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_ft_16_to_24_attempted_count_season_to_date,
+        avg(ft_16_to_24_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_ft_16_to_24_made_count_season_to_date,
+        avg(ft_16_to_24_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_ft_16_to_24_pct_season_to_date,
+        avg(ft_24_plus_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_ft_24_plus_attempted_count_season_to_date,
+        avg(ft_24_plus_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_ft_24_plus_made_count_season_to_date,
+        avg(ft_24_plus_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_ft_24_plus_pct_season_to_date,
+        avg(backcourt_attempted_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_backcourt_attempted_count_season_to_date,
+        avg(backcourt_made_count) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_backcourt_made_count_season_to_date,
+        avg(backcourt_pct) over (partition by player_id, season order by game_date rows between unbounded preceding and 1 preceding) as avg_backcourt_pct_season_to_date
     from shot_zones
 )
 
