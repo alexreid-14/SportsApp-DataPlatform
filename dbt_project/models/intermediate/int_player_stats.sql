@@ -1,3 +1,11 @@
+{{
+    config(
+        materialized='table',
+        indexes=[{'columns': ['player_id', 'game_id'], 'unique': True}],
+        postgresqlConfig={'max_parallel_workers_per_gather': 0}
+    )
+}}
+
 with player_games as (
     select * from {{ ref('player_game') }}
 ),

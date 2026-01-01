@@ -7,7 +7,7 @@
 with source as (
     select *
     from {{ source('nba', 'lineup_shot_data') }}
-),
+)
 
 select
     s.season,

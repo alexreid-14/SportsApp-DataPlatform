@@ -9,12 +9,17 @@ with game_defensive_stats as (
         and g1.team_id != g2.team_id
 ),
 
+players as (
+    select *
+    from {{ ref('stg_players') }}
+),
+
 team_defensive_stats as (
     select
         g.game_id,
         g.team_id,
         g.opponent_team_id,
-        p.player_position,
+        p.position as player_position,
         sum(bs.field_goals_made) as field_goals_made,
         sum(bs.field_goals_attempted) as field_goals_attempted,
         sum(bs.three_pointers_made) as three_pointers_made,
@@ -33,7 +38,7 @@ team_defensive_stats as (
     left join {{ ref('stg_box_scores') }} bs
         on g.game_id = bs.game_id and g.opponent_team_id = bs.team_id
     left join players p on bs.player_id = p.player_id
-    group by g.game_id, g.team_id, g.opponent_team_id, bs.player_position
+    group by g.game_id, g.team_id, g.opponent_team_id, p.position
 )
 
 select * from team_defensive_stats

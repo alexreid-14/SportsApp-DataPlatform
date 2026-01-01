@@ -24,7 +24,6 @@ players as (
 player_last_played as (
     select
         bs.player_id,
-        p.player_position,
         g.season,
         g.game_date,
         g.game_id,
@@ -40,7 +39,7 @@ player_games as (
     select
         g.game_id,
         bs.player_id,
-        p.player_position,
+        pl.position as player_position,
         g.game_type,
         g.game_date,
         g.season,
@@ -70,6 +69,7 @@ player_games as (
 
     from games g
     join all_box_scores bs on g.game_id = bs.game_id
+    left join players pl on bs.player_id = pl.player_id
     left join player_last_played p
         on bs.player_id = p.player_id
         and g.season = p.season
@@ -79,6 +79,7 @@ player_games as (
 select
     game_id,
     player_id,
+    player_position,
     game_type,
     game_date,
     season,

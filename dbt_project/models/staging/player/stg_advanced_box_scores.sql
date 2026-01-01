@@ -1,7 +1,7 @@
 with source as (
     select *
     from {{ source('nba', 'advanced_box_scores') }}
-),
+)
 
 select
     s.game_id,
