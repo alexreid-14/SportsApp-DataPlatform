@@ -1,25 +1,51 @@
+{{
+    config(
+        materialized='incremental',
+        unique_key=['game_id', 'player_id'],
+        on_schema_change='fail'
+    )
+}}
+
 with player_game as (
     select * from {{ ref('player_game') }}
+    {% if is_incremental() %}
+    where game_date > (select max(game_date) from {{ this }})
+    {% endif %}
 ),
 
 box_scores as (
     select * from {{ ref('stg_box_scores') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from player_game)
+    {% endif %}
 ),
 
 player_stats as (
     select * from {{ ref('int_player_stats') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from player_game)
+    {% endif %}
 ),
 
 player_shots as (
     select * from {{ ref('int_player_shots') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from player_game)
+    {% endif %}
 ),
 
 team_stats as (
     select * from {{ ref('int_team_stats') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from player_game)
+    {% endif %}
 ),
 
 opponent_shot_defense as (
     select * from {{ ref('int_opponent_shot_defense') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from player_game)
+    {% endif %}
 ),
 
 player_points as (
@@ -95,16 +121,14 @@ player_points as (
         ps.avg_fga_last_5,
         ps.avg_3pm_last_5,
         ps.avg_3pa_last_5,
-        ps.avg_ftm_last_5,
-        ps.avg_fta_last_5,
         ps.avg_mp_last_5,
         -- Advanced Box Score
         ps.avg_off_rating_last_5,
         ps.avg_e_off_rating_last_5,
         ps.avg_efg_pct_last_5,
-        ps.avg_ts_pct_last_5,
-        ps.avg_usg_pct_last_5,
-        ps.avg_e_usg_pct_last_5,
+        ps.avg_ts_last_5,
+        ps.avg_usg_last_5,
+        ps.avg_e_usg_last_5,
         ps.avg_e_pace_last_5,
         ps.avg_pace_last_5,
         ps.avg_pace_per40_last_5,
@@ -126,8 +150,6 @@ player_points as (
         ps.avg_fga_vs_opp_this_season,
         ps.avg_3pm_vs_opp_this_season,
         ps.avg_3pa_vs_opp_this_season,
-        ps.avg_ftm_vs_opp_this_season,
-        ps.avg_fta_vs_opp_this_season,
         ps.avg_mp_vs_opp_this_season,
         -- Advanced Box Score
         ps.avg_off_rating_vs_opp_this_season,
@@ -169,12 +191,12 @@ player_points as (
         tso.avg_off_team_pace_last_5,
         tso.avg_off_team_pace_per40_last_5,
         -- Vs opponent this season
-        tso.avg_points_scored_vs_opp_this_season,
-        tso.avg_off_team_off_rating_vs_opp_this_season,
-        tso.avg_off_team_e_off_rating_vs_opp_this_season,
-        tso.avg_off_team_e_pace_vs_opp_this_season,
-        tso.avg_off_team_pace_vs_opp_this_season,
-        tso.avg_off_team_pace_per40_vs_opp_this_season,
+        tso.avg_points_scored_vs_opp,
+        tso.avg_off_team_off_rating_vs_opp,
+        tso.avg_off_team_e_off_rating_vs_opp,
+        tso.avg_off_team_e_pace_vs_opp,
+        tso.avg_off_team_pace_vs_opp,
+        tso.avg_off_team_pace_per40_vs_opp,
 
         ----------------------------
         -- Opponent Team Stats --
@@ -244,13 +266,13 @@ player_points as (
         os.opp_total_fga_last_5,
         os.opp_total_fg_pct_last_5,
         -- Vs opponent this season
-        tsd.avg_points_allowed_vs_opp_this_season,
-        tsd.avg_3pm_allowed_vs_opp_this_season,
-        tsd.avg_opp_def_rating_vs_opp_this_season,
-        tsd.avg_opp_e_def_rating_vs_opp_this_season,
-        tsd.avg_opp_e_pace_vs_opp_this_season,
-        tsd.avg_opp_pace_vs_opp_this_season,
-        tsd.avg_opp_pace_per40_vs_opp_this_season,
+        tsd.avg_points_allowed_vs_opp,
+        tsd.avg_3pm_allowed_vs_opp,
+        tsd.avg_opp_def_rating_vs_opp,
+        tsd.avg_opp_e_def_rating_vs_opp,
+        tsd.avg_opp_e_pace_vs_opp,
+        tsd.avg_opp_pace_vs_opp,
+        tsd.avg_opp_pace_per40_vs_opp,
         os.opp_above_the_break_3_fga_vs_opp_season_to_date,
         os.opp_above_the_break_3_fg_pct_vs_opp_season_to_date,
         os.opp_mid_range_fga_vs_opp_season_to_date,

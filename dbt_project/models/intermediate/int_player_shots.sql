@@ -1,15 +1,32 @@
+{{
+    config(
+        materialized='incremental',
+        unique_key=['game_id', 'player_id'],
+        on_schema_change='fail'
+    )
+}}
+
 with player_games as (
     select * from {{ ref('player_game') }}
+    {% if is_incremental() %}
+    where game_date > (select max(game_date) from {{ this }})
+    {% endif %}
 ),
 
 shot_data as (
     select * from {{ ref('stg_shot_data') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from player_games)
+    {% endif %}
 ),
 
 box_scores as (
     select game_id, player_id, minutes_played
     from {{ ref('stg_box_scores') }}
     where minutes_played is not null and minutes_played > 0
+    {% if is_incremental() %}
+    and game_id in (select distinct game_id from player_games)
+    {% endif %}
 ),
 
 player_stats as (

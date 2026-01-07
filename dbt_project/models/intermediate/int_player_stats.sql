@@ -1,6 +1,8 @@
 {{
     config(
-        materialized='table',
+        materialized='incremental',
+        unique_key=['game_id', 'player_id'],
+        on_schema_change='fail',
         indexes=[{'columns': ['player_id', 'game_id'], 'unique': True}],
         postgresqlConfig={'max_parallel_workers_per_gather': 0}
     )
@@ -8,10 +10,16 @@
 
 with player_games as (
     select * from {{ ref('player_game') }}
+    {% if is_incremental() %}
+    where game_date > (select max(game_date) from {{ this }})
+    {% endif %}
 ),
 
 box_scores as (
     select * from {{ ref('stg_box_scores') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from player_games)
+    {% endif %}
 ),
 
 advanced_box_scores as (

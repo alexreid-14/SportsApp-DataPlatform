@@ -1,0 +1,187 @@
+version: 2
+
+models:
+  - name: int_player_stats
+    description: |
+      Player performance statistics with rolling averages (season-to-date, last 5 games, vs opponent).
+      Combines box scores, advanced stats, tracking data, and usage metrics.
+    config:
+      materialized: incremental
+      unique_key: ['game_id', 'player_id']
+    columns:
+      - name: game_id
+        description: Unique identifier for the game
+        tests:
+          - not_null
+      - name: player_id
+        description: Unique identifier for the player
+        tests:
+          - not_null
+      - name: game_date
+        description: Date the game was played
+        tests:
+          - not_null
+      - name: season
+        description: NBA season (e.g., '2024-25')
+        tests:
+          - not_null
+      - name: avg_points_season_to_date
+        description: Average points per game from season start through this game
+      - name: avg_points_last_5
+        description: Average points per game over the last 5 games played
+      - name: avg_ts_pct_season_to_date
+        description: Average true shooting percentage season to date
+      - name: avg_usg_pct_season_to_date
+        description: Average usage percentage season to date
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - game_id
+            - player_id
+
+  - name: int_player_shots
+    description: |
+      Player shot location data with rolling averages by shot zone.
+      Includes shot attempts, makes, and percentages from different court areas.
+    config:
+      materialized: incremental
+      unique_key: ['game_id', 'player_id']
+    columns:
+      - name: game_id
+        description: Unique identifier for the game
+        tests:
+          - not_null
+      - name: player_id
+        description: Unique identifier for the player
+        tests:
+          - not_null
+      - name: game_date
+        description: Date the game was played
+        tests:
+          - not_null
+      - name: season
+        description: NBA season
+        tests:
+          - not_null
+      - name: avg_above_the_break_3_attempted_count_season_to_date
+        description: Average above-the-break 3-point attempts per game season to date
+      - name: avg_above_the_break_3_pct_season_to_date
+        description: Above-the-break 3-point field goal percentage season to date
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - game_id
+            - player_id
+
+  - name: int_team_stats
+    description: |
+      Team performance statistics with offensive and defensive metrics.
+      Includes rolling averages for season-to-date, last 5 games, and vs specific opponents.
+    config:
+      materialized: incremental
+      unique_key: ['game_id', 'team_id']
+    columns:
+      - name: game_id
+        description: Unique identifier for the game
+        tests:
+          - not_null
+      - name: team_id
+        description: Unique identifier for the team
+        tests:
+          - not_null
+      - name: game_date
+        description: Date the game was played
+        tests:
+          - not_null
+      - name: season
+        description: NBA season
+        tests:
+          - not_null
+      - name: avg_points_scored_season_to_date
+        description: Average points scored per game season to date (offensive)
+      - name: avg_points_allowed_season_to_date
+        description: Average points allowed per game season to date (defensive)
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - game_id
+            - team_id
+
+  - name: int_opponent_shot_defense
+    description: |
+      Opponent shot defense statistics by shot zone.
+      Tracks how well teams defend different shot types and court areas.
+    config:
+      materialized: incremental
+      unique_key: ['game_id', 'team_id']
+    columns:
+      - name: game_id
+        description: Unique identifier for the game
+        tests:
+          - not_null
+      - name: team_id
+        description: Team ID (defensive team)
+        tests:
+          - not_null
+      - name: game_date
+        description: Date the game was played
+        tests:
+          - not_null
+      - name: season
+        description: NBA season
+        tests:
+          - not_null
+      - name: opp_above_the_break_3_fga_season_to_date
+        description: Above-the-break 3-point attempts allowed season to date
+      - name: opp_above_the_break_3_fg_pct_season_to_date
+        description: Opponent field goal percentage on above-the-break 3s season to date
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - game_id
+            - team_id
+
+  - name: player_game
+    description: |
+      Base player-game grain combining game context with player participation.
+      Includes days since last game, back-to-back flags, team performance, and position.
+    config:
+      materialized: table
+    columns:
+      - name: game_id
+        description: Unique identifier for the game
+        tests:
+          - not_null
+      - name: player_id
+        description: Unique identifier for the player
+        tests:
+          - not_null
+      - name: game_date
+        description: Date the game was played
+        tests:
+          - not_null
+      - name: season
+        description: NBA season
+        tests:
+          - not_null
+      - name: player_position
+        description: Player's position (G, F, C, G-F, F-C, etc.)
+      - name: home_team_flag
+        description: Boolean indicating if player's team is home team
+      - name: opponent_team_id
+        description: Opponent team ID
+        tests:
+          - not_null
+      - name: days_since_previous_game
+        description: Days elapsed since player's previous game
+      - name: is_back_to_back
+        description: Boolean indicating if game is on consecutive days
+      - name: team_game_number
+        description: Sequential game number for the team this season
+      - name: team_win_percentage
+        description: Team's win percentage through this game
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - game_id
+            - player_id

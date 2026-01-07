@@ -1,21 +1,44 @@
-with team_box_scores as (
+{{
+    config(
+        materialized='incremental',
+        unique_key=['game_id', 'team_id'],
+        on_schema_change='fail'
+    )
+}}
+
+with games as (
+    select * from {{ ref('games') }}
+    {% if is_incremental() %}
+    where game_date > (select max(game_date) from {{ this }})
+    {% endif %}
+),
+
+team_box_scores as (
     select * from {{ ref('stg_team_box_scores') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from games)
+    {% endif %}
 ),
 
 team_advanced_box_scores as (
     select * from {{ ref('stg_team_advanced_box_scores') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from games)
+    {% endif %}
 ),
 
 team_def_box_scores as (
     select * from {{ ref('stg_team_def_box_scores') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from games)
+    {% endif %}
 ),
 
 team_def_adv_box_scores as (
     select * from {{ ref('stg_team_def_adv_box_scores') }}
-),
-
-games as (
-    select * from {{ ref('games') }}
+    {% if is_incremental() %}
+    where game_id in (select distinct game_id from games)
+    {% endif %}
 ),
 
 -- Team defensive game stats (what the team allowed to opponents)

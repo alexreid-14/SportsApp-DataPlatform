@@ -1,6 +1,8 @@
 {{
     config(
-        materialized='table',
+        materialized='incremental',
+        unique_key=['game_id', 'team_id'],
+        on_schema_change='fail',
         indexes=[{'columns': ['game_id', 'team_id'], 'unique': True}],
         postgresqlConfig={'max_parallel_workers_per_gather': 0}
     )
@@ -8,6 +10,9 @@
 
 with player_shot_data as (
     select * from {{ ref('int_player_shots') }}
+    {% if is_incremental() %}
+    where game_date > (select max(game_date) from {{ this }})
+    {% endif %}
 ),
 
 -- Join player shots with box scores to get team context

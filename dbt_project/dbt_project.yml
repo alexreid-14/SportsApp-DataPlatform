@@ -19,8 +19,9 @@ clean-targets:
 models:
   nba_analytics:
     +materialized: table
+    +schema: nba_analytics
     staging:
-      +materialized: view
+      +materialized: table
     intermediate:
       +materialized: table
     marts:
